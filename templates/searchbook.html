@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block body %}
+{% if request.method == "GET" %}
+<div class="container text-center">
+	<h2 class="display-4">Search Books</h2>
+	<form method="post" action="/searchbook">
+		<div class="form-group">
+			<input type="text" class="form-control" id="title" name="title" placeholder="Title of the Book">
+		</div>
+
+		<div class="form-group">
+			<input type="text" class="form-control" id="author" name="author" placeholder="Author of the Book">
+		</div>
+
+		<div class="form-group">
+			<input type="text" class="form-control" id="publisher" name="publisher" placeholder="Publisher of the Book">
+		</div>
+
+		<div class="form-group">
+			<input type="text" class="form-control" id="isbn13" name="isbn13" placeholder="ISBN 13" minlength=13 maxlength=13>
+		</div>
+
+		<div class="form-group">
+			<input type="text" class="form-control" id="supplierID" name="supplierID" placeholder="Supplier ID">
+		</div>
+
+		<button type="submit" class="btn btn-success">Submit</button>
+	</form>
+</div>	
+{% endif %}
+{% if request.method == "POST" %}
+<div class="container">
+	<h2 class="display-4 text-center">Book Search Results</h2>
+	<table class="table table-hover">
+		<thead>
+			<tr class="bg-info">
+				<th>ID</th>
+				<th>Title</th>
+				<th>Author</th>
+				<th>Publisher</th>
+				<th>ISBN 13</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for book in payload.books %}
+			<tr>
+				<td>{{book[0]}}</td>
+				<td>{{book[1]}}</td>
+				<td>{{book[2]}}</td>
+				<td>{{book[4]}}</td>
+				<td>{{book[5]}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endif %}
+{% endblock %}

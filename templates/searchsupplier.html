@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block body %}
+{% if request.method == "GET" %}
+<div class="container text-center">
+	<h2 class="display-4">Search Suppliers</h2>
+	<form method="post" action="/searchsupplier">
+		<div class="form-group">
+			<input type="text" class="form-control" id="name" name="name" placeholder="Name of the Supplier">
+		</div>
+
+		<div class="form-group">
+			<input type="text" class="form-control" id="supplierID" name="supplierID" placeholder="Supplier ID">
+		</div>
+
+		<button type="submit" class="btn btn-success">Submit</button>
+	</form>
+</div>	
+{% endif %}
+{% if request.method == "POST" %}
+<div class="container">
+	<h2 class="display-4 text-center">Supplier Search Results</h2>
+	<table class="table table-hover">
+		<thead>
+			<tr class="bg-info">
+				<th>ID</th>
+				<th>Name</th>
+				<th>Phone</th>
+				<th>Address</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for supplier in payload.suppliers %}
+			<tr>
+				<td>{{supplier[0]}}</td>
+				<td>{{supplier[1]}}</td>
+				<td>{{supplier[2]}}</td>
+				<td>{{supplier[3]}}</td>
+				<td>{{supplier[4]}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endif %}
+{% endblock %}

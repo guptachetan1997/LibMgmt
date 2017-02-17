@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block body %}
+{% if request.method == "GET" %}
+<div class="container text-center">
+	<h2 class="display-4">Search Patrons</h2>
+	<form method="post" action="/searchpatron">
+		<div class="form-group">
+			<input type="text" class="form-control" id="id" name="id" placeholder="ID of the Patron">
+		</div>
+		<div class="form-group">
+			<input type="text" class="form-control" id="name" name="name" placeholder="Name of the Patron">
+		</div>
+		<div class="form-group">
+			<input type="text" class="form-control" id="cardNum" name="cardNum" placeholder="Card Number of the Patron">
+		</div>
+		<button type="submit" class="btn btn-success">Submit</button>
+	</form>
+</div>	
+{% endif %}
+{% if request.method == "POST" %}
+<div class="container">
+	<h2 class="display-4 text-center">Patron Search Results</h2>
+	<table class="table table-hover">
+		<thead>
+			<tr class="bg-info">
+				<th>ID</th>
+				<th>CardNum</th>
+				<th>Name</th>
+				<th>DOJ</th>
+				<th>Phone</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for patron in payload.patrons %}
+			<tr>
+				<td>{{patron[0]}}</td>
+				<td>{{patron[1]}}</td>
+				<td>{{patron[2]}}</td>
+				<td>{{patron[4]}}</td>
+				<td>{{patron[6]}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endif %}
+{% endblock %}

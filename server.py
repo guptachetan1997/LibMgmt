@@ -129,6 +129,24 @@ def searchSupplier():
 			suppliers = db_util.querySupplier(supplier)
 			return render_template("searchsupplier.html", payload={"suppliers":suppliers})
 
+@app.route("/searchpatron", methods=["POST", "GET"])
+@login_required
+def searchPatron():
+	if request.method == "GET":
+		return render_template("searchpatron.html", payload={"type":"patron"})
+	if request.method == "POST":
+		form_data = request.form
+		if request.method == "POST":
+			form_data = request.form
+			patron = {
+			"id" : form_data.get('id'),
+			"name" : form_data.get('name'),
+			"cardNum" : form_data.get('cardNum'),
+			}
+			patrons = db_util.queryPatron(patron)
+			print(patrons)
+			return render_template("searchpatron.html", payload={"patrons":patrons})
+
 @app.route("/apply", methods=["POST", "GET"])
 def patronApply():
 	if request.method == "GET":

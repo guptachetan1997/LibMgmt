@@ -130,6 +130,27 @@ def querySupplier(params):
 		print(e)
 		return None
 
+def queryPatron(params):
+	clause = []
+	if params.get("id") is not None and params.get("id") is not '':
+		clause.append("id=:id")
+	if params.get("name") is not None and params.get("name") is not '':
+		clause.append("name LIKE '%{}%'".format(params.get("name")))
+	if params.get("cardNum") is not None and params.get("cardNum") is not '':
+		clause.append("id=:cardNum")
+
+	if clause:
+		query = "SELECT * FROM patron WHERE {}".format(" AND ".join(clause))
+	else:
+		query = "SELECT * FROM patron"
+	try:
+		cursor.execute(query, params)
+		patron_list = cursor.fetchall()
+		return patron_list
+	except Exception as e:
+		print(e)
+		return None
+
 def getBookStatus(bookID):
 	try:
 		cursor.execute('''SELECT COUNT(*) FROM issue WHERE bookID=?''', (bookID, ))
@@ -142,13 +163,6 @@ def getBookStatus(bookID):
 
 
 if __name__ == '__main__':
-	# supplier = {
-	# 	"name" : "Kohli Books & Books",
-	# 	"phone" : "9818017768",
-	# 	"address" : "B 1238, Sector 11, Gurgaon-122001, Palam Vihar"
-	# }
-	# insertSupplier(supplier)
-
 	book = {
 		"title" : "American Gangster",
 		"author" : "Max Allan Collins",
@@ -157,12 +171,4 @@ if __name__ == '__main__':
 		"isbn13" :  "9780765359018",
 		"supplierID" : "1"
 	}
-	insertBook(book)
-# def getAllBooks():
-# 	try:
-# 		cursor.execute('''SELECT * FROM book''')
-# 		book_list = cursor.fetchall()
-# 		return book_list
-# 	except Exception as e:
-# 		print(e)
-# 		return None
+	# insertBook(book)

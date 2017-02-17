@@ -57,7 +57,10 @@ def searchBook():
 			"supplierID" : form_data.get('supplierID')
 			}
 			books = db_util.queryBook(book)
-			return render_template("searchbook.html", payload={"books":books})
+			statuses = []
+			for bookOBJ in books:
+				statuses.append(db_util.getBookStatus(bookOBJ[0]))
+			return render_template("searchbook.html", payload={"books":books, "statuses":statuses})
 
 @app.route("/searchsupplier", methods=["POST", "GET"])
 def searchSupplier():
@@ -73,6 +76,26 @@ def searchSupplier():
 			}
 			suppliers = db_util.querySupplier(supplier)
 			return render_template("searchsupplier.html", payload={"suppliers":suppliers})
+
+@app.route("/apply", methods=["POST", "GET"])
+def patronApply():
+	if request.method == "GET":
+		return render_template("apply.html")
+	if request.method == "POST":
+		pass
+		form_data = request.form
+		patron_form = {
+		"name" : form_data.get('name'),
+		"dob" : form_data.get('dob'),
+		"address" : form_data.get('address'),
+		"phone" : form_data.get('phone')
+		}
+		status = db_util.insertPatronReg(patron_form)
+		if status == False:
+			flash("Error in data entered.")
+			return redirect("/apply")
+		else:
+			return redirect("/")
 
 
 @app.route("/")

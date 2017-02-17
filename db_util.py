@@ -24,6 +24,18 @@ def insertBook(book):
 		print(e)
 		return False
 
+def insertPatronReg(patron):
+	try:
+		cursor.execute('''
+			INSERT INTO patron_reg(name, dob, address, phone)
+			VALUES(:name, :dob, :address, :phone)
+			''', patron)
+		connection.commit()
+		return True
+	except Exception as e:
+		print(e)
+		return False
+
 
 def queryBook(params):
 	clause = []
@@ -65,6 +77,15 @@ def querySupplier(params):
 		cursor.execute(query, params)
 		supplier_list = cursor.fetchall()
 		return supplier_list
+	except Exception as e:
+		print(e)
+		return None
+
+def getBookStatus(bookID):
+	try:
+		cursor.execute('''SELECT COUNT(*) FROM issue WHERE bookID=?''', (bookID, ))
+		flag = cursor.fetchone()
+		return flag[0]
 	except Exception as e:
 		print(e)
 		return None

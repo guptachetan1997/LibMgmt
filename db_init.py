@@ -30,13 +30,22 @@ def create_tables():
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	cardNum INTEGER UNIQUE,
 	name VARCHAR(50),
-	age INTEGER,
+	dob DATE,
 	doj DATE,
 	address TEXT,
 	phone VARCHAR(10),
 	borrowLimit INTEGER DEFAULT 2);''')
 	connection.commit()
 	print("User Table Created")
+
+	cursor.execute('''CREATE TABLE IF NOT EXISTS patron_reg(
+	regID INTEGER PRIMARY KEY AUTOINCREMENT,
+	name VARCHAR(50),
+	dob DATE,
+	address TEXT,
+	phone VARCHAR(10));''')
+	connection.commit()
+	print("User Reg Table Created")
 
 	cursor.execute('''CREATE TABLE IF NOT EXISTS issue(
 	transID INTEGER PRIMARY KEY AUTOINCREMENT,

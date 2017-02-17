@@ -40,6 +40,7 @@
 				<th>Author</th>
 				<th>Publisher</th>
 				<th>ISBN 13</th>
+				<th>Status</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -50,6 +51,11 @@
 				<td>{{book[2]}}</td>
 				<td>{{book[4]}}</td>
 				<td>{{book[5]}}</td>
+				{% if payload.statuses[loop.index0] == 0 %}
+					<td><span class="badge badge-success">Available</span></td>
+				{% else %}
+					<td><span class="badge badge-danger">Issued</span></td>
+				{% endif %}
 			</tr>
 			{% endfor %}
 		</tbody>

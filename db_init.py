@@ -51,9 +51,11 @@ def create_tables():
 	transID INTEGER PRIMARY KEY AUTOINCREMENT,
 	bookID INTEGER,
 	patronID INTEGER,
+	librarianID INTEGER,
 	issueDate DATE,
 	FOREIGN KEY (bookID) REFERENCES book(id),
-	FOREIGN KEY (patronID) REFERENCES patron(id));''')
+	FOREIGN KEY (patronID) REFERENCES patron(id),
+	FOREIGN KEY (librarianID) REFERENCES librarian(id));''')
 	print("Issue Table Created")
 	connection.commit()
 
@@ -61,13 +63,24 @@ def create_tables():
 	transID INTEGER PRIMARY KEY,
 	bookID INTEGER,
 	patronID INTEGER,
+	issuedbyID INTEGER,
+	returnedtoID INTEGER,
 	issueDate DATE,
 	returnDate DATE,
 	lateFees INTEGER,
 	FOREIGN KEY (bookID) REFERENCES book(id),
-	FOREIGN KEY (patronID) REFERENCES patron(id));''')
+	FOREIGN KEY (patronID) REFERENCES patron(id),
+	FOREIGN KEY (issuedbyID) REFERENCES librarian(id),
+	FOREIGN KEY (returnedtoID) REFERENCES librarian(id));''')
 	print("Issue History Table Created")
 	connection.commit()
+
+	cursor.execute('''CREATE TABLE IF NOT EXISTS librarian(
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	username VARCHAR(50) UNIQUE NOT NULL,  
+	password VARCHAR(100) NOT NULL);''')
+	connection.commit()
+	print("Librarian table Created")
 
 
 if __name__ == '__main__':

@@ -36,6 +36,55 @@ def insertPatronReg(patron):
 		print(e)
 		return False
 
+def queryPatronReg():
+	try:
+		cursor.execute('''SELECT * FROM patron_reg;''')
+		regs = cursor.fetchall()
+		return regs
+	except Exception as e:
+		print(e)
+		return None
+
+def querySinglePatronReg(regID):
+	try:
+		cursor.execute('''SELECT * FROM patron_reg WHERE regID=:regID;''', (regID,))
+		reg = cursor.fetchone()
+		return reg
+	except Exception as e:
+		print(e)
+		return None
+
+def deletePatronReg(regID):
+	try:
+		cursor.execute('''DELETE FROM patron_reg WHERE regID=:regID''', (regID,))
+		connection.commit()
+		return True
+	except Exception as e:
+		print(e)
+		return False
+
+def insertPatron(patron):
+	try:
+		cursor.execute(
+		'''INSERT INTO patron(cardNum,name,dob,doj,address,phone,borrowLimit) 
+		VALUES(:cardNum,:name,:dob,:doj,:address,:phone,:borrowLimit)''', patron)
+		connection.commit()
+		return True
+	except Exception as e:
+		print(e)
+		return False
+
+def isUniqueCardNumber(canumber):
+	try:
+		cursor.execute('''
+			SELECT COUNT(*) FROM patron WHERE cardNum=:canumber''', (canumber, ))
+		num = cursor.fetchone()
+		return num[0] == 0
+	except Exception as e:
+		print(e)
+		return None
+
+
 
 def queryBook(params):
 	clause = []

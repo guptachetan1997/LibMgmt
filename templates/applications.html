@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container">
+	<h2 class="display-4 text-center">Applications for Patronage</h2>
+	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	{% for message in messages %}
+	<div class="alert alert-danger alert-dismissible fade show" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+		{{message}}
+	</div>
+	{% endfor %}
+	{% endif %}
+	{% endwith %}
+	<table class="table table-hover">
+		<thead>
+			<tr class="bg-info">
+				<th>ID</th>
+				<th>Name</th>
+				<th>DOB</th>
+				<th>Phone</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for patron in payload.applications %}
+			<tr>
+				<td>{{patron[0]}}</td>
+				<td>{{patron[1]}}</td>
+				<td>{{patron[2]}}</td>
+				<td>{{patron[4]}}</td>
+				<td>
+				<a class="btn btn-success btn-sm" href="/accept/{{patron[0]}}" role="button">Accept</a>
+				<a class="btn btn-danger btn-sm" href="/reject/{{patron[0]}}" role="button">Reject</a>
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endblock %}

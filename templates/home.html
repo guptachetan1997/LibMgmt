@@ -5,14 +5,13 @@
 
     <div class="starter-template">
     <h1>Library Management</h1>
-        {% if payload.books %}
       <p class="lead">
-        {% for book in payload.books%}
-          {{book[1]}}
-          <br>
-        {% endfor %}
+        Welcome to Library Management System.
+        <br>
+        Unauthorised user can Search for available books and apply for patronage.
+        <br>
+        While authorised librarians can login to perform administrative tasks.
       </p>
-      {% endif %}
     </div>
 
   </div>

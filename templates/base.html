@@ -24,12 +24,9 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <a class="navbar-brand" href="/">LibMgnt</a>
-
+    {% if current_user.is_authenticated %}
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
       <ul class="navbar-nav mr-auto">
-        <!-- <li class="nav-item active">
-          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-        </li> -->
         <li class="nav-item">
           <a class="nav-link" href="/addbook">Add Book</a>
         </li>
@@ -42,6 +39,9 @@
         <li class="nav-item">
           <a class="nav-link" href="#">Return</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/applications">Applications</a>
+        </li>
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Search</a>
             <div class="dropdown-menu" aria-labelledby="dropdown01">
@@ -50,8 +50,26 @@
               <a class="dropdown-item" href="#">Users</a>
             </div>
           </li>
+          <li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
       </ul>
     </div>
+    {% else %}
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/searchbook">Search Books</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/apply">Apply</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/login">Login</a>
+        </li>
+      </ul>
+    </div>
+    {% endif %}
   </nav>
 
       {% block body %}

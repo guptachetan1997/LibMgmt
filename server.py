@@ -13,6 +13,10 @@ bcrypt = Bcrypt()
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+def calcLateFees(date1, date2):
+	lateFees = 0
+	return lateFees
+
 def generate():
 	caNum = random.randint(100000, 999999)
 	if db_util.isUniqueCardNumber(caNum):
@@ -35,12 +39,14 @@ def login():
 		password = form_data.get("password")
 		if validate(username) and validate(password):
 			librarian = Librarian()
-			librarian.get(username)
+			librarian = librarian.get(username)
 			if librarian:
 				if bcrypt.check_password_hash(librarian.password, password):
 					librarian.authenticated = True
 					login_user(librarian)
 					return redirect('/')
+			else:
+				flash("Incorrect Credentials.", "danger")
 	return render_template("login.html")
 
 @app.route('/logout')
@@ -68,7 +74,7 @@ def addBook():
 		}
 		status = db_util.insertBook(book)
 		if status == False:
-			flash("Error in data entered.")
+			flash("Error in data entered.", "danger")
 			return redirect("/addbook")
 		else:
 			return redirect("/")
@@ -144,7 +150,6 @@ def searchPatron():
 			"cardNum" : form_data.get('cardNum'),
 			}
 			patrons = db_util.queryPatron(patron)
-			print(patrons)
 			return render_template("searchpatron.html", payload={"patrons":patrons})
 
 @app.route("/apply", methods=["POST", "GET"])
@@ -162,7 +167,7 @@ def patronApply():
 		}
 		status = db_util.insertPatronReg(patron_form)
 		if status == False:
-			flash("Error in data entered.")
+			flash("Error in data entered.", "danger")
 			return redirect("/apply")
 		else:
 			return redirect("/")
@@ -178,7 +183,7 @@ def patronApplications():
 def rejectApplication(regID):
 	flag = db_util.deletePatronReg(regID)
 	if flag is False:
-		flash("Error in rejecting.")		
+		flash("Error in rejecting.", "danger")		
 	return redirect("/applications")
 
 @app.route("/accept/<int:regID>")
@@ -198,8 +203,77 @@ def acceptApplication(regID):
 		flag = db_util.insertPatron(patron)
 		db_util.deletePatronReg(regID)
 		if flag is False:
-			flash("Error in Accepting.")
+			flash("Error in Accepting.", "danger")
 		return redirect("/applications")
+
+@app.route("/issuereturn", methods=["GET"])
+@login_required
+def isseureturn():
+	return render_template("issuereturn.html")
+
+@app.route("/issue", methods=["POST"])
+@login_required
+def issueBook():
+	if request.method == "POST":
+		form_data = request.form
+		issueRequest = {
+		"bookID" : form_data.get('bookID'),
+		"patronID" : form_data.get('patronID'),
+		"librarianID" : form_data.get('librarianID'),
+		"issueDate" : datetime.datetime.today().strftime("%d-%m-%Y")
+		}
+		book_exists = db_util.getBookExistence(issueRequest.get("bookID"))
+		patron_exists = db_util.getPatronExistence(issueRequest.get("patronID"))
+		if book_exists is True:
+			if patron_exists is True:
+				book_status = db_util.getBookStatus(issueRequest.get("bookID"))
+				can_patron_borrow = db_util.canPatronBorrow(issueRequest.get("patronID"))
+				if book_status is True:
+					if can_patron_borrow is True:
+						insert_status = db_util.insertIssue(issueRequest)
+						if insert_status is False:
+							flash("Error in Issueing.", "danger")
+					else:
+						flash('Patron cannot borrow more.', "danger")
+				else:
+					flash("Book is Issued.", "danger")
+			else:
+				flash("Patron does not exist.", "danger")
+		else:
+			flash("Book does not Exist.", "danger")
+		flash("Book issued Successfully", "success")
+		return redirect('/issuereturn')
+
+@app.route("/return", methods=["POST"])
+@login_required
+def returnBook():
+	if request.method == "POST":
+		form_data = request.form
+		returnRequest = {
+			"bookID" : form_data.get("bookID"),
+			"returnedtoID" : form_data.get("librarianID"),
+		}
+		issue = db_util.queryIssueByBook(returnRequest.get("bookID"))
+		if issue is not None:
+			returnRequest["transID"] = issue[0]
+			returnRequest["patronID"] = issue[2]
+			returnRequest["issuedbyID"] = issue[3]
+			returnRequest["issueDate"] = issue[4]
+			returnRequest["returnDate"] = datetime.datetime.today().strftime("%d-%m-%Y")
+			returnRequest["lateFees"] = calcLateFees(returnRequest["issueDate"],returnRequest["returnDate"])
+			flag = db_util.insertIssueHistory(returnRequest)
+			if flag is False:
+				flash("Error in Returning")
+			else:
+				db_util.deleteIssue(returnRequest["transID"])
+				if returnRequest["lateFees"] > 0:
+					flash("You have to pay {} Rs. as fine.".format(returnRequest["lateFees"]))
+				else:
+					flash("Book Returned Successfully", "success")
+		else:
+			flash("Book is not Issued yet.", "danger")
+	return redirect("/issuereturn")
+
 
 @app.route("/")
 def home():

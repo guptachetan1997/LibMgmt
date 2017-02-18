@@ -9,6 +9,7 @@ class Librarian(object):
 		try:
 			cursor.execute('''SELECT * FROM librarian WHERE username=:username''', (username, ))
 			librarian = cursor.fetchone()
+			self.librarianID = librarian[0]
 			self.username = librarian[1]
 			self.password = librarian[2]
 			self.authenticated = False

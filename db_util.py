@@ -77,15 +77,52 @@ def insertPatron(patron):
 def isUniqueCardNumber(canumber):
 	try:
 		cursor.execute('''
-			SELECT COUNT(*) FROM patron WHERE cardNum=:canumber''', (canumber, ))
+			SELECT COUNT(*) FROM patron WHERE cardNum=?''', (canumber, ))
 		num = cursor.fetchone()
 		return num[0] == 0
 	except Exception as e:
 		print(e)
 		return None
 
+def insertIssue(issue):
+	try:
+		cursor.execute('''
+			INSERT INTO issue(bookID,patronID,librarianID,issueDate)
+			VALUES(:bookID,:patronID,:librarianID,:issueDate)''', issue)
+		connection.commit()
+		return True
+	except Exception as e:
+		print(e)
+		return False
 
+def deleteIssue(issueID):
+	try:
+		cursor.execute('''DELETE FROM issue WHERE transID=?''', (issueID, ))
+		connection.commit()
+		return True
+	except Exception as e:
+		print(e)
+		return False
 
+def insertIssueHistory(issueHistory):
+	try:
+		cursor.execute('''
+			INSERT INTO issue_history(transID,bookID,patronID,issuedbyID,returnedtoID,issueDate,returnDate,lateFees)
+			VALUES(:transID,:bookID,:patronID,:issuedbyID,:returnedtoID,:issueDate,:returnDate,:lateFees)
+			''', issueHistory)
+		connection.commit()
+		return True
+	except Exception as e:
+		return False
+
+def queryIssueByBook(bookID):
+	try:
+		cursor.execute('''SELECT * FROM issue WHERE bookID=?''', (bookID, ))
+		issue = cursor.fetchone()
+		return issue
+	except Exception as e:
+		print(e)
+		return None
 def queryBook(params):
 	clause = []
 	if params.get("title") is not None and params.get("title") is not '':
@@ -155,12 +192,40 @@ def getBookStatus(bookID):
 	try:
 		cursor.execute('''SELECT COUNT(*) FROM issue WHERE bookID=?''', (bookID, ))
 		flag = cursor.fetchone()
-		return flag[0]
+		return flag[0] == 0
 	except Exception as e:
 		print(e)
 		return None
 
+def getBookExistence(bookID):
+	try:
+		cursor.execute('''SELECT COUNT(*) FROM book WHERE id=?''', (bookID,))
+		flag = cursor.fetchone()
+		return flag[0] == 1
+	except Exception as e:
+		print(e)
+		return None
 
+def getPatronExistence(patronID):
+	try:
+		cursor.execute('''SELECT COUNT(*) FROM patron WHERE id=?''', (patronID,))
+		flag = cursor.fetchone()
+		return flag[0] == 1
+	except Exception as e:
+		print(e)
+		return None
+
+def canPatronBorrow(patronID):
+	try:
+		cursor.execute('''SELECT COUNT(*) FROM issue WHERE patronID=?''', (patronID,))
+		borrows = cursor.fetchone()[0]
+		cursor.execute('''SELECT borrowLimit FROM patron WHERE id=?''', (patronID,))
+		borrowLimit = cursor.fetchone()[0]
+		# print(borrows, borrowLimit)
+		return borrows<borrowLimit
+	except Exception as e:
+		print(e)
+		return None
 
 if __name__ == '__main__':
 	book = {

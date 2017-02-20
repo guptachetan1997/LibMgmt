@@ -1,19 +1,86 @@
 {% extends "base.html" %}
 
 {% block body %}
-  <div class="container">
-
-    <div class="starter-template">
-    <h1>Library Management</h1>
-      <p class="lead">
-        Welcome to Library Management System.
-        <br>
-        Unauthorised user can Search for available books and apply for patronage.
-        <br>
-        While authorised librarians can login to perform administrative tasks.
-      </p>
-    </div>
-
-  </div>
+{% if current_user.is_authenticated %}
+<div class="container-fluid" >
+<div class="text-center">
+		<h1>Library Management</h1>
+		<br>
+	</div>
+	<div class="row">
+		<div class="col-sm-6" >
+			<div class="card card-outline-primary">
+				<h4 class="card-header text-center card-outline-primary">
+					Recent Issues
+				</h4>
+				<div class="card-block table-responsive">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+							<th>#transID</th>
+								<th>Book</th>
+								<th>Patron</th>
+								<th>Date</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for issue in payload.issues[:5] %}
+							<tr>
+								<th scope="row">{{issue[0]}}</th>
+								<td><a href="/book/{{issue[1]}}">{{issue[2]}}</a></td>
+								<td>{{issue[4]}}</td>
+								<td>{{issue[5]}}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6" >
+			<div class="card card-outline-primary">
+				<h4 class="card-header text-center card-outline-primary">
+					Recent Returns
+				</h4>
+				<div class="card-block table-responsive">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+							<th>#transID</th>
+								<th>Book</th>
+								<th>Patron</th>
+								<th>Date</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for returned in payload.returns[:5] %}
+							<tr>
+								<th scope="row">{{returned[0]}}</th>
+								<td><a href="/book/{{returned[1]}}">{{returned[2]}}</a></td>
+								<td>{{returned[4]}}</td>
+								<td>{{returned[5]}}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% else %}
+<div class="container">
+	<div class="text-center">
+		<h1>Library Management</h1>
+		<p class="lead">
+			Welcome to Library Management System.
+			<br>
+			Unauthorised user can Search for available books and apply for patronage.
+			<br>
+			While authorised librarians can login to perform administrative tasks.
+		</p>
+	</div>
+</div>
+{% endif %}
 
 {% endblock %}

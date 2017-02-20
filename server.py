@@ -9,12 +9,18 @@ import random
 app = Flask(__name__)
 app.secret_key = '%qufh2ea8!-$%_ctzw=in*d2__i#s*3_mph82!+(3m9g*!%@tt'
 app.config['SESSION_TYPE'] = 'filesystem'
+LATE_FINE = 5
 bcrypt = Bcrypt()
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-def calcLateFees(date1, date2):
+def calcLateFees(issueDate, returnDate):
 	lateFees = 0
+	date1OBJ = datetime.datetime.strptime(issueDate, "%d-%m-%Y")
+	date2OBJ = datetime.datetime.strptime(returnDate, "%d-%m-%Y")
+	days_issued = (date2OBJ-date1OBJ).days
+	if days_issued>7:
+		lateFees = (days_issued-7)*LATE_FINE
 	return lateFees
 
 def generate():
@@ -231,6 +237,7 @@ def issueBook():
 				if book_status is True:
 					if can_patron_borrow is True:
 						insert_status = db_util.insertIssue(issueRequest)
+						flash("Book issued Successfully", "success")
 						if insert_status is False:
 							flash("Error in Issueing.", "danger")
 					else:
@@ -241,7 +248,6 @@ def issueBook():
 				flash("Patron does not exist.", "danger")
 		else:
 			flash("Book does not Exist.", "danger")
-		flash("Book issued Successfully", "success")
 		return redirect('/issuereturn')
 
 @app.route("/return", methods=["POST"])
@@ -267,17 +273,35 @@ def returnBook():
 			else:
 				db_util.deleteIssue(returnRequest["transID"])
 				if returnRequest["lateFees"] > 0:
-					flash("You have to pay {} Rs. as fine.".format(returnRequest["lateFees"]))
+					flash("You have to pay {} Rs. as fine.".format(returnRequest["lateFees"]), "success")
 				else:
 					flash("Book Returned Successfully", "success")
 		else:
 			flash("Book is not Issued yet.", "danger")
 	return redirect("/issuereturn")
 
+@app.route("/book/<int:bookID>")
+@login_required
+def bookInfo(bookID):
+	payload = {}
+	book_exists = db_util.getBookExistence(bookID)
+	if book_exists is True:
+		payload['book_info'] = db_util.queryBook({"id":bookID})[0]
+		payload['book_status'] = db_util.getBookStatus(bookID)
+		payload['issue_history'] = db_util.queryIssueHistoryByBook(bookID)
+		payload['issued_to'] = db_util.queryIssueByBook(bookID,patron=True)
+	return render_template("bookinfo.html", payload=payload)
+
 
 @app.route("/")
 def home():
-	return render_template("home.html")
+	payload = {}
+	if current_user.is_authenticated is not False:
+		latest_issues = db_util.getLatestIssues()
+		latest_returns = db_util.getLatestReturns()
+		payload['issues'] = latest_issues
+		payload['returns'] = latest_returns
+	return render_template("home.html", payload=payload)
 
 if __name__ == "__main__":
 	app.run()

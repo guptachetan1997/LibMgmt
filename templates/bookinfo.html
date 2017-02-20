@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container-fluid" style="padding-top: 70px;">
+	<h3 class="display-4 text-center">{{payload.book_info[1]}}</h3>
+	<table align="center">
+		<thead>
+		</thead>
+		<tbody>
+			<tr>
+				<th scope="row">Author</th>
+				<td>{{payload.book_info[2]}}</td>
+			</tr>
+			<tr>
+				<th scope="row">Publisher</th>
+				<td>{{payload.book_info[4]}}</td>
+			</tr>
+			<tr>
+				<th scope="row">Publish Date</th>
+				<td>{{payload.book_info[3]}}</td>
+			</tr>
+			<tr>
+				<th scope="row">ISBN13</th>
+				<td>{{payload.book_info[5]}}</td>
+			</tr>
+			<tr>
+				<th scope="row">Supplier</th>
+				<td>{{payload.book_info[6]}}</td>
+			</tr>
+		</tbody>
+	</table>
+	<br>
+	<div class="container col-sm-6 text-center">
+	{% if payload.book_status %}
+	<div class="alert alert-success" role="alert">
+		<strong>Available</strong>
+	</div>
+	{% else %}
+	<div class="alert alert-info" role="alert">
+		<strong>Issued to </strong> <a href="#" class="alert-link">{{payload.issued_to[5]}}</a>
+	</div>
+	{% endif %}
+	</div>
+	<div class="col-sm-6 container">
+			<div class="card card-outline-primary">
+				<h4 class="card-header text-center card-outline-primary">
+					Issue History
+				</h4>
+				<div class="card-block table-responsive">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+							<th>#transID</th>
+								<th>Patron</th>
+								<th>Issue Date</th>
+								<th>Return Date</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for issue in payload.issue_history %}
+							<tr>
+								<th scope="row">{{issue[0]}}</th>
+								<td>{{issue[2]}}</td>
+								<td>{{issue[3]}}</td>
+								<td>{{issue[4]}}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+</div>
+<br><br>
+{% endblock %}

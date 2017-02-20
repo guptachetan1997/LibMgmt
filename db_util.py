@@ -115,14 +115,57 @@ def insertIssueHistory(issueHistory):
 	except Exception as e:
 		return False
 
-def queryIssueByBook(bookID):
+def queryIssueByBook(bookID, patron=False):
 	try:
-		cursor.execute('''SELECT * FROM issue WHERE bookID=?''', (bookID, ))
+		if patron:
+			cursor.execute('''
+				SELECT transID,bookID,patronID,librarianID,issueDate,name 
+				FROM issue,patron 
+				WHERE patronID=patron.id AND bookID=?;''',(bookID, ))
+		else:
+			cursor.execute('''SELECT * FROM issue WHERE bookID=?''', (bookID, ))
 		issue = cursor.fetchone()
 		return issue
 	except Exception as e:
 		print(e)
 		return None
+
+def queryIssueHistoryByBook(bookID):
+	try:
+		cursor.execute('''SELECT transID,patronID,name,issueDate,returnDate 
+			FROM issue_history,patron 
+			WHERE patronID=patron.id AND bookID=?
+			ORDER BY returnDate DESC, transID DESC;''', (bookID, ))
+		issue_history = cursor.fetchall()
+		return issue_history
+	except Exception as e:
+		print(e)
+		return None
+
+def getLatestIssues():
+	try:
+		cursor.execute('''SELECT transID,bookID,title,patronID,name,issueDate 
+			FROM issue,book,patron 
+			WHERE bookID=book.id AND patronID=patron.id 
+			ORDER BY issueDate DESC, transID DESC;''')
+		issues = cursor.fetchall()
+		return issues
+	except Exception as e:
+		print(e)
+		return None
+
+def getLatestReturns():
+	try:
+		cursor.execute('''SELECT transID,bookID,title,patronID,name,returnDate 
+			FROM issue_history,book,patron 
+			WHERE bookID=book.id AND patronID=patron.id 
+			ORDER BY returnDate DESC, transID DESC;''')
+		returns = cursor.fetchall()
+		return returns
+	except Exception as e:
+		print(e)
+		return None
+
 def queryBook(params):
 	clause = []
 	if params.get("title") is not None and params.get("title") is not '':
@@ -135,6 +178,8 @@ def queryBook(params):
 		clause.append("publisher LIKE '%{}%'".format(params.get("publisher")))
 	if params.get("supplierID") is not None and params.get("supplierID") is not '':
 		clause.append("supplierID=:supplierID")
+	if params.get("id") is not None and params.get("id") is not '':
+		clause.append("id=:id")
 
 	if clause:
 		query = "SELECT * FROM book WHERE {}".format(" AND ".join(clause))

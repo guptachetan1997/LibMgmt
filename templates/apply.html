@@ -3,7 +3,7 @@
 {% block body %}
 <div class="container text-center">
 	<h2 class="display-4">Apply for Patronage</h2>
-	{% with messages = get_flashed_messages() %}
+	{% with messages = get_flashed_messages(with_categories=true) %}
 	{% if messages %}
 	{% for category,message in messages %}
 	<div class="alert alert-{{category}} alert-dismissible fade show" role="alert">

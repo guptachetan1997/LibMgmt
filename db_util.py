@@ -74,6 +74,20 @@ def insertPatron(patron):
 		print(e)
 		return False
 
+def getPatronIssues(patronID):
+	try:
+		cursor.execute(
+			'''
+			SELECT bookID,title,issueDate 
+			FROM issue,book 
+			WHERE bookID=book.id AND patronID=?;
+			''', (patronID, ))
+		issues = cursor.fetchall()
+		return issues
+	except Exception as e:
+		print(e)
+		return None
+
 def isUniqueCardNumber(canumber):
 	try:
 		cursor.execute('''
@@ -220,6 +234,8 @@ def queryPatron(params):
 		clause.append("name LIKE '%{}%'".format(params.get("name")))
 	if params.get("cardNum") is not None and params.get("cardNum") is not '':
 		clause.append("id=:cardNum")
+	if params.get("id") is not None and params.get("id") is not '':
+		clause.append("id=:id")
 
 	if clause:
 		query = "SELECT * FROM patron WHERE {}".format(" AND ".join(clause))
@@ -266,7 +282,6 @@ def canPatronBorrow(patronID):
 		borrows = cursor.fetchone()[0]
 		cursor.execute('''SELECT borrowLimit FROM patron WHERE id=?''', (patronID,))
 		borrowLimit = cursor.fetchone()[0]
-		# print(borrows, borrowLimit)
 		return borrows<borrowLimit
 	except Exception as e:
 		print(e)

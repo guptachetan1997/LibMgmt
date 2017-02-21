@@ -13,6 +13,7 @@ LATE_FINE = 5
 bcrypt = Bcrypt()
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = "/login"
 
 def calcLateFees(issueDate, returnDate):
 	lateFees = 0
@@ -285,6 +286,7 @@ def returnBook():
 def bookInfo(bookID):
 	payload = {}
 	book_exists = db_util.getBookExistence(bookID)
+	payload["book_exists"] = book_exists
 	if book_exists is True:
 		payload['book_info'] = db_util.queryBook({"id":bookID})[0]
 		payload['book_status'] = db_util.getBookStatus(bookID)
@@ -292,6 +294,16 @@ def bookInfo(bookID):
 		payload['issued_to'] = db_util.queryIssueByBook(bookID,patron=True)
 	return render_template("bookinfo.html", payload=payload)
 
+@app.route("/patron/<int:patronID>")
+@login_required
+def patronInfo(patronID):
+	payload = {}
+	patron_exists = db_util.getPatronExistence(patronID)
+	payload["patron_exists"] = patron_exists
+	if patron_exists is True:
+		payload["patron_info"] = db_util.queryPatron({"id":patronID})[0]
+		payload["issues"] = db_util.getPatronIssues(patronID)
+	return render_template("patroninfo.html", payload=payload)
 
 @app.route("/")
 def home():

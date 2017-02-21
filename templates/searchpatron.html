@@ -34,7 +34,7 @@
 		<tbody>
 			{% for patron in payload.patrons %}
 			<tr>
-				<td>{{patron[0]}}</td>
+				<td><a href="/patron/{{patron[0]}}">{{patron[0]}}</a></td>
 				<td>{{patron[1]}}</td>
 				<td>{{patron[2]}}</td>
 				<td>{{patron[4]}}</td>

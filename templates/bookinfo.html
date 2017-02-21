@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
+{% if payload.book_exists %}
 <div class="container-fluid" style="padding-top: 70px;">
 	<h3 class="display-4 text-center">{{payload.book_info[1]}}</h3>
 	<table align="center">
@@ -37,7 +38,7 @@
 	</div>
 	{% else %}
 	<div class="alert alert-info" role="alert">
-		<strong>Issued to </strong> <a href="#" class="alert-link">{{payload.issued_to[5]}}</a>
+		<strong>Issued to </strong> <a href="/patron/{{payload.issued_to[2]}}" class="alert-link">{{payload.issued_to[5]}}</a>
 	</div>
 	{% endif %}
 	</div>
@@ -72,4 +73,11 @@
 		</div>
 </div>
 <br><br>
+{% else %}
+<div class="container text-center" style="padding-top: 100px;">
+<div class="alert alert-danger" role="alert">
+  <strong>Oh snap!</strong> Book does not exist.
+</div>
+</div>
+{% endif %}
 {% endblock %}
